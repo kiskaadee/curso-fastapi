@@ -20,7 +20,13 @@ class TimeResponse(BaseModel):
     minute: str 
     seconds: str 
     meridian: str | None = None
-    
+
+class Customer(BaseModel):
+    name: str
+    description: str | None = None
+    email: str
+    age: int
+
 def lookup_timezone(iso_code: str)->ZoneInfo:
     if len(iso_code) != 2:
         raise HTTPException(status_code=400, detail="Invalid ISO code format.")
@@ -103,3 +109,14 @@ async def time(iso_code: str, format: str = "12h"):
             )
         case _:
             raise HTTPException(status_code=400, detail="Invalid time format reached structural match.")
+
+@app.post("/customer")
+async def create_customer(customer_data: Customer):
+    # to-do
+    return Response(status_code=201)
+
+@app.get("/customer/{customer_id}")
+async def get_customer(customer_id: int):
+    # to-do
+    return Response(status_code=200)
+

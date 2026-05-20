@@ -10,10 +10,10 @@ This directory contains my step-by-step progress through the Platzi FastAPI cour
     - Starlette, Pydantic (intro), `uv` basics, and OpenAPI documentation.
 3.  **[Clase 3: Virtual Environments & First Endpoint](./03-venv-and-first-endpoint.md)**
     - The "classic" pip workflow, first endpoints, CORS, and the Favicon hack.
-4.  **[Clase 4: Dynamic Endpoints (Path Parameters)](./04-path-parameters.md)**
-    - Path parameters, input normalization, `pytz`, and the "Funny Message" detour.
-5.  **[Clase 5: Query Parameters & Pydantic](./05-query-params-and-pydantic.md)**
-    - Path vs. Query, Pydantic `BaseModel`, and error status codes.
+4.  **[Clase 4: Path & Query Parameters](./04-path-and-query-params.md)**
+    - Dynamic routes, input normalization, `pytz`, and formatting options (`?format=24h`).
+5.  **[Clase 5: Pydantic Schemas & POST Endpoints](./05-pydantic-schemas-and-post.md)**
+    - Using `BaseModel` for Request Bodies, 201 Created status, and automatic validation (422).
 
 ---
 
