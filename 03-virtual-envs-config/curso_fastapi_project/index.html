@@ -102,7 +102,7 @@
             await new Promise(resolve => setTimeout(resolve, 1000));
             await fetchAndDisplay('display', 'msg', (data) => data.message);
             await new Promise(resolve => setTimeout(resolve, 1000));
-            await fetchAndDisplay('clock', 'time', (data) => {
+            await fetchAndDisplay('clock', 'time/CO', (data) => {
                 return `${data.day}/${data.month}/${data.year} - ${data.hour}:${data.minute}:${data.second}`;
             })
         }

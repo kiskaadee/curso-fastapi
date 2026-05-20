@@ -137,3 +137,55 @@ await fetchAndDisplay('clock', 'time', (data) => {
 3. **`strftime` is a lifesaver**: Python's `strftime` codes make it really easy to extract exactly the part of the date you want.
 4. **FastAPI ❤️ Async**: Even for simple things, it's good practice to use `async def` to keep the server snappy.
 
+---
+
+## 🌎 Dynamic endpoints (Path Parameters)
+> Date: 2026-05-20
+Static endpoints are easy, but in the real world, you need your API to respond differently depending on what the user wants. We upgraded our time endpoint to handle different countries!
+
+### 🛠️ The Implementation
+Instead of just `/time`, we now use `/time/{iso_code}`. I also found a "lazy" way to handle timezones by using the `pytz` library to look them up automatically based on the country code.
+
+**Python Side (`main.py`):**
+```python
+@app.get("/time/{iso_code}")
+async def time(iso_code: str):
+    # Normalize the input (e.g., "co" -> "CO")
+    iso = iso_code.upper().strip()
+    
+    # Use pytz to find the timezone for that country
+    timezones = pytz.country_timezones.get(iso)
+    
+    if not timezones:
+        # If the country doesn't exist, we send a 404 error
+        raise HTTPException(status_code=404, detail="Country code not found")
+    
+    # We grab the first timezone found for that country
+    target_tz = timezones[0]
+    current_time = datetime.now(ZoneInfo(target_tz))
+    
+    return {
+        "iso": iso,
+        "timezone": target_tz,
+        "day": current_time.strftime("%d"),
+        "hour": current_time.strftime("%H"),
+        # ... and the rest of the fields
+    }
+```
+
+### 🧠 Key Takeaways
+1. **Path Parameters `{}`**: Putting a name in brackets in the URL makes the endpoint dynamic. It's like passing a variable to a function through the browser.
+2. **Typing is power**: By telling FastAPI that `iso_code` is a `str`, we get better autocompletion (like `.upper()`) and the editor helps us catch bugs before we even run the code.
+3. **Robust Input**: Users can be messy. Using `.upper().strip()` ensures that `/time/co` and `/time/CO ` both work perfectly.
+4. **Handling Errors**: With `HTTPException`, we can send back specific status codes (like 404) and clear messages when something goes wrong, instead of just letting the server crash.
+5. **Dynamic documentation**: The coolest part? FastAPI automatically updates the Swagger docs (`/docs`) to show that the endpoint now expects a parameter!
+
+### Key Concept: Path vs. Query:
+
+- **Path Parameters** (/time/CO): Used to identify a specific resource (In this case, the country). If it's missing, the URL is technically incomplete.
+
+- **Query Parameters** (/time/CO?format=12h): Used to filter or format the resource. The resource is the same, we're just changing how it's presented.
+
+
+## Next challenge: 
+Create a new endpoint that receives a query parameter (GET format) so the user can choose whether they want the time in 24-hour or 12-hour format. 
