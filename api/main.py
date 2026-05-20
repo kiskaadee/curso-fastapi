@@ -86,21 +86,6 @@ async def time(iso_code: str, format: str = "12h"):
     timezone_object: ZoneInfo = lookup_timezone(iso_code)
     current_time: datetime = datetime.now(timezone_object)
 
-    # time_object: dict[str, str | None] = {
-    #     "minute": current_time.strftime("%M"),
-    #     "seconds": current_time.strftime("%S"),
-    # }
-    # match format:
-    #     case "12h":
-    #         time_object["hour"] = current_time.strftime("%I")
-    #         time_object["meridian"] = current_time.strftime("%p")
-    #     case "24h":
-    #         time_object["hour"] = current_time.strftime("%H")
-    #         time_object["meridian"] = None
-    #     case _: 
-    #         pass
-
-    # return time_object
     match format:
         case "12h":
             return TimeResponse(
