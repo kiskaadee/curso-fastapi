@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Board</title>
+    <style>
+        body {
+            background-color: aqua;
+            font-family: sans-serif;
+            font-size: large;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            margin: 0;    
+        }
+
+        #display {
+            padding: auto;
+            border-radius: 5px;
+            border: none;
+            font-weight: bold;
+        }
+        .error {
+            color: #d93025;
+            background-color: #feefee;
+            border-color: #fadad7 !important;
+        }
+        .success{
+            color: #188038;
+            background-color: #e6f4ea;
+            border-color: #ceead6 !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="display">
+        Attempting to connect to server...    
+    </div>
+    <script>
+        async function getMessage() {
+            const display = document.getElementById('display');
+            const url = 'http://127.0.0.1:8000/msg';
+
+            try {
+                const response = await fetch(url);
+                
+                // Handle specific HTTP status codes
+                if (response.status === 404) {
+                    display.innerText = 'Resource not found (404)';
+                    display.className = 'error';
+                    return; // Stop execution here
+                }
+
+                if (!response.ok) {
+                    throw new Error('Server error');
+                }
+
+                const data = await response.json();
+                display.innerText = data.message;
+                display.className = 'success';
+
+            } catch (error) {
+                // This runs if the fetch fails entirely (Server is down)
+                display.innerText = 'Server not found / Connection refused';
+                display.className = 'error';
+                console.error('Connection error:', error);
+            }
+        }
+
+        getMessage();
+    </script>
+</body>
+</html>
