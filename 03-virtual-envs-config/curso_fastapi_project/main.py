@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Response
+from datetime import datetime
+
 app = FastAPI()
 
 app.add_middleware(
@@ -23,3 +24,15 @@ def message():
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return Response(status_code=204)
+
+@app.get("/time")
+async def time():
+    current_time = datetime.now()
+    return {
+        "day": current_time.strftime("%d"),
+        "month": current_time.strftime("%B"), # Full month name (e.g., "May")
+        "year": current_time.strftime("%Y"),
+        "hour": current_time.strftime("%H"),
+        "minute": current_time.strftime("%M"),
+        "second": current_time.strftime("%S"),
+    }

@@ -71,13 +71,13 @@ Everything is generated automatically based on your code (this is thanks to the 
 ### 1. The Frontend & The CORS "Wall"
 I built a tiny `index.html` to fetch data from the API. But browsers have a security feature called **CORS** (Cross-Origin Resource Sharing). If your HTML file tries to talk to a server on a different port/address, the browser blocks it by default.
 
-**The Fix**: Adding the CORS middleware to `main.py` tells the server: *"It's okay, I trust these guys."*
+**The Fix**: I had to add some "CORS middleware" to `main.py` to tell the server: *"It's okay, let my local HTML file talk to you."* I used `"*"` to keep it simple for now, but I'll need to be more careful about security later!
 ```python
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware, 
-    allow_origins=["*"], # In production, don't use "*"!
+    allow_origins=["*"], 
     allow_methods=["*"],
     # ...
 )
@@ -97,4 +97,43 @@ async def favicon():
 
 ## ✅ Summary / Takeaways
 The classic way is a bit more manual (**Create -> Activate -> Install**), but it's the bread and butter of Python development. Plus, we learned that FastAPI isn't just a server—it's an auto-documenting, frontend-friendly beast.
+
+---
+
+## 🏆 Challenge: The "What Time Is It?" Endpoint
+*Goal: Create an endpoint that returns the current date and time.*
+
+### 🛠️ The Implementation
+I decided to go beyond a simple string and return a **structured JSON object**. This gives the frontend more freedom to display the information.
+
+**Python Side (`main.py`):**
+Used the `datetime` module and defined the endpoint as `async def`. It's better to get used to the async way early on!
+```python
+@app.get("/time")
+async def time():
+    current_time = datetime.now()
+    return {
+        "day": current_time.strftime("%d"),
+        "month": current_time.strftime("%B"),
+        "year": current_time.strftime("%Y"),
+        "hour": current_time.strftime("%H"),
+        "minute": current_time.strftime("%M"),
+        "second": current_time.strftime("%S"),
+    }
+```
+
+**Frontend Side (`index.html`):**
+Keeping the JS minimal since we're focusing on the backend. The important part is how we fetch our new endpoint and pick the fields we need:
+```javascript
+// Fetching the time and formatting the display
+await fetchAndDisplay('clock', 'time', (data) => {
+    return `${data.day}/${data.month}/${data.year} - ${data.hour}:${data.minute}:${data.second}`;
+});
+```
+
+### 🧠 Key Takeaways
+1. **JSON is Automatic**: In FastAPI, if you return a Python `dict`, it's automatically converted to a JSON object. No manual `json.dumps()` needed!
+2. **Give the frontend options**: Sending separate fields (day, month, hour) is much better than sending one big string. It lets whoever is using the API choose what to show and how.
+3. **`strftime` is a lifesaver**: Python's `strftime` codes make it really easy to extract exactly the part of the date you want.
+4. **FastAPI ❤️ Async**: Even for simple things, it's good practice to use `async def` to keep the server snappy.
 
