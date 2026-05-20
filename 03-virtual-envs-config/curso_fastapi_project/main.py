@@ -2,7 +2,9 @@ from fastapi import FastAPI, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from pydantic import BaseModel
 import pytz
+
 app = FastAPI()
 
 app.add_middleware(
@@ -12,6 +14,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+class TimeResponse(BaseModel):
+    hour: str
+    minute: str 
+    seconds: str 
+    meridian: str | None = None
+    
+def lookup_timezone(iso_code: str)->ZoneInfo:
+    if len(iso_code) != 2:
+        raise HTTPException(status_code=400, detail="Invalid ISO code format.")
+    iso:str = iso_code.upper().strip()
+    
+    timezones: list[str] | None = pytz.country_timezones.get(iso)
+    
+    if not timezones:
+        raise HTTPException(status_code=404, detail="Country code not found or has no timezones.")
+
+    target_timezone_name: str = timezones[0]
+    
+    try:
+        return ZoneInfo(target_timezone_name)
+    except ZoneInfoNotFoundError:
+        raise HTTPException(status_code=500, detail="Timezone data missing on server.")
 
 @app.get("/")
 async def root():
@@ -26,46 +51,70 @@ def message():
         "Monday": "the Moon",
         "Tuesday": "Mars",
         "Wednesday": "Mercury",
-        "Thursday": "Jupyter",
+        "Thursday": "Jupiter",
         "Friday": "Venus",
         "Saturday": "Saturn"
     }
             
-    message: str = f"Greetings from {astronomical_objects[weekday]}!"
-    return {"message": message}
+    msg: str = f"Greetings from {astronomical_objects[weekday]}!"
+    return {"message": msg}
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return Response(status_code=204)
 
-@app.get("/time/{iso_code}")
-async def time(iso_code: str)->dict[str, str]:
+@app.get("/date/{iso_code}")
+async def date(iso_code: str) -> dict[str, str]:
+    timezone_object: ZoneInfo = lookup_timezone(iso_code)
+    current_time: datetime = datetime.now(timezone_object)
+    return {
+        "iso": iso_code.upper(),
+        "day": current_time.strftime("%d"),
+        "month": current_time.strftime("%B"),
+        "year": current_time.strftime("%Y"),
+    }
 
-    iso = iso_code.upper().strip()
-    
-    # lookup timezones for country
-    timezones: list[str]|None = pytz.country_timezones.get(iso)
-    
-    if not timezones:
-        raise HTTPException(status_code=404, detail="Country code not found or has no timezones")
-    
-    # 3- Select a Specific Timezone
-    target_timezone_name:str = timezones[0]
-    
-    try:
-        # 4. Convert time using ZoneInfo
-        # get the server time, then project it into target timezone
-        current_time = datetime.now(ZoneInfo(target_timezone_name))
-        
-        return {
-            "iso": iso,
-            "timezone": target_timezone_name, # time zone name: e.g., America/Bogotá
-            "day": current_time.strftime("%d"), # day of the month (01-31)
-            "month": current_time.strftime("%B"), # Full month name (January)
-            "year": current_time.strftime("%Y"), # year with century - 2026
-            "hour": current_time.strftime("%H"), #  hour of the day, 24-hour clock (00 - 23)
-            "minute": current_time.strftime("%M"), # minute of the hour 
-            "second": current_time.strftime("%S"), # second of the minute
-        }
-    except ZoneInfoNotFoundError:
-        raise HTTPException(status_code=404, detail="Timezone data missing from system")
+@app.get("/time/{iso_code}", response_model=TimeResponse)
+async def time(iso_code: str, format: str = "12h"):
+    allowed_timeformat = ["12h", "24h"]
+    if format not in allowed_timeformat:
+        raise HTTPException(
+            status_code=400,
+            detail="Time format not supported. Enter '12h' or '24h'",
+        )
+
+    timezone_object: ZoneInfo = lookup_timezone(iso_code)
+    current_time: datetime = datetime.now(timezone_object)
+
+    # time_object: dict[str, str | None] = {
+    #     "minute": current_time.strftime("%M"),
+    #     "seconds": current_time.strftime("%S"),
+    # }
+    # match format:
+    #     case "12h":
+    #         time_object["hour"] = current_time.strftime("%I")
+    #         time_object["meridian"] = current_time.strftime("%p")
+    #     case "24h":
+    #         time_object["hour"] = current_time.strftime("%H")
+    #         time_object["meridian"] = None
+    #     case _: 
+    #         pass
+
+    # return time_object
+    match format:
+        case "12h":
+            return TimeResponse(
+                hour=current_time.strftime("%I"),
+                minute=current_time.strftime("%M"),
+                seconds=current_time.strftime("%S"),
+                meridian=current_time.strftime("%p")
+            )
+        case "24h":
+            return TimeResponse(
+                hour=current_time.strftime("%H"),
+                minute=current_time.strftime("%M"),
+                seconds=current_time.strftime("%S"),
+                meridian=None
+            )
+        case _:
+            raise HTTPException(status_code=400, detail="Invalid time format reached structural match.")
