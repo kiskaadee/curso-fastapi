@@ -14,6 +14,8 @@ This directory contains my step-by-step progress through the Platzi FastAPI cour
     - Dynamic routes, input normalization, `pytz`, and formatting options (`?format=24h`).
 5.  **[Clase 5: Pydantic Schemas & POST Endpoints](./05-pydantic-schemas-and-post.md)**
     - Using `BaseModel` for Request Bodies, 201 Created status, and automatic validation (422).
+6.  **[Clase 6: Data Modeling & Connections](./06-data-modelling-connection.md)**
+    - Layered architecture, `EmailStr`, DTO pattern, and computed fields.
 
 ---
 

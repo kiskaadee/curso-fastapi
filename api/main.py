@@ -2,8 +2,10 @@ from fastapi import FastAPI, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-from pydantic import BaseModel
-import pytz
+import pytz  
+# import our models file
+from models import TimeResponse, Customer, Transaction, InvoiceCreate, InvoiceResponse
+
 
 app = FastAPI()
 
@@ -14,18 +16,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-
-class TimeResponse(BaseModel):
-    hour: str
-    minute: str 
-    seconds: str 
-    meridian: str | None = None
-
-class Customer(BaseModel):
-    name: str
-    description: str | None = None
-    email: str
-    age: int
 
 def lookup_timezone(iso_code: str)->ZoneInfo:
     if len(iso_code) != 2:
@@ -120,3 +110,13 @@ async def get_customer(customer_id: int):
     # to-do
     return Response(status_code=200)
 
+
+@app.post("/transaction")
+async def create_transaction(transaction_data: Transaction):
+    # to-do
+    return Response(status_code=201)
+
+@app.post("/invoice")
+async def create_invoice(invoice_data: InvoiceCreate):
+    # to-do
+    return Response(status_code=201)
