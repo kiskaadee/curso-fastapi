@@ -1,12 +1,6 @@
 from pydantic import BaseModel, EmailStr, computed_field
 from datetime import datetime
 
-class TimeResponse(BaseModel):
-    hour: str
-    minute: str 
-    seconds: str 
-    meridian: str | None = None
-
 class Customer(BaseModel):
     name: str
     description: str | None = None
