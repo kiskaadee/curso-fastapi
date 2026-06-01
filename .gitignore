@@ -5,3 +5,6 @@ env/
 *__pycache__
 fastapi-venv*
 .curso-fastapi
+.mypy_cache/
+.pytest_cache/
+.ruff_cache

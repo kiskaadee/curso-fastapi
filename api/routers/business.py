@@ -1,16 +1,17 @@
 from fastapi import APIRouter, Response
-import models.business as bsch # import all business schemas
+
+import models.business as bsch  # import all business schemas
 
 business_router = APIRouter(tags=["Business"])
+
 
 #        --- CUSTOMERS ---
 @business_router.post("/customer", response_model=bsch.Customer, status_code=201)
 async def create_customer(customer_data: bsch.CustomerCreate):
-    """
-    
-    """
+    """ """
     # to-do
     return customer_data
+
 
 @business_router.get("/customer/{customer_id}")
 async def get_customer(customer_id: int):
@@ -23,7 +24,6 @@ async def get_customer(customer_id: int):
 async def create_transaction(transaction_data: bsch.Transaction):
     # to-do
     return Response(status_code=201)
-
 
 
 #       --- INVOICES ---
