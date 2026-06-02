@@ -59,3 +59,31 @@ async def create_customer(customer_data: CustomerCreate):
 1. **Contract Enforcement**: Pydantic isn't just "advice"—it's a runtime shield that rejects bad data before it hits your logic.
 2. **Decoupling is Freedom**: By keeping Services ignorant of HTTP, you could technically run your logic in a CLI or a background script without changing a single line of business code.
 3. **Routers are Translators**: Keep them thin. Their job is to translate "Web speak" (JSON/HTTP) into "Python speak" (Models/Exceptions) and back again.
+
+---
+
+## 📦 Standardizing Collections: The Generic Envelope Pattern
+When returning lists of objects (like customers or transactions), it's a best practice to wrap them in a consistent "envelope." This allows you to add metadata (like `total_count`) without breaking the client's expectations.
+
+We used Pydantic's `Generic` and `TypeVar` to create a reusable `Envelope[T]` model:
+
+```python
+T = TypeVar("T")
+
+class Envelope(BaseModel, Generic[T]):
+    data: List[T]
+    total_count: int
+```
+
+This pattern ensures that every collection endpoint returns a JSON object with a `data` array and a `total_count` integer, making the API more predictable for front-end developers.
+
+---
+
+## 🛠️ Refining the Refactor: Bug Fixes & Enforcements
+Even with a solid architecture, small edge cases can cause "silent" failures or ugly error messages. We addressed two critical ones:
+
+1. **Offset-aware Datetimes**: Comparing a local "naive" datetime with a timezone-aware ISO string (from Pydantic/Client) will crash with a `TypeError`. We now enforce `timezone.utc` across all service-level timestamps:
+   ```python
+   timestamp: datetime = datetime.now(timezone.utc)
+   ```
+2. **Clean Error Responses**: When catching exceptions in Routers, using `str(e)` on a `KeyError` can sometimes wrap the message in extra quotes (e.g., `' "Customer not found" '`). Accessing `e.args[0]` directly ensures the JSON `detail` field is a clean, unquoted string.
