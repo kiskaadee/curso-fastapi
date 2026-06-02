@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from typing import Generic, List, TypeVar
 
 from pydantic import (
     BaseModel,
@@ -9,6 +10,13 @@ from pydantic import (
     model_validator,
 )
 from pydantic.fields import Field
+
+T = TypeVar("T")  # define a generic type variable
+
+
+class Envelope(BaseModel, Generic[T]):
+    data: List[T]
+    total_count: int
 
 
 class CustomerBase(BaseModel):

@@ -1,12 +1,10 @@
-from typing import Dict
-
 from fastapi import APIRouter
 from fastapi.exceptions import HTTPException
-from typing_extensions import List
 
 from models.business import (
     Customer,
     CustomerCreate,
+    Envelope,
     Invoice,
     InvoiceCreate,
     Transaction,
@@ -33,7 +31,7 @@ async def create_customer(customer_data: CustomerCreate):
     return new_customer(customer_data)
 
 
-@business_router.get("/customers", response_model=Dict[int, Customer])
+@business_router.get("/customers", response_model=Envelope[Customer])
 async def get_all_customers():
     return list_customers()
 
@@ -56,9 +54,9 @@ async def create_transaction(transaction_data: TransactionCreate):
 
 
 @business_router.get(
-    "/customers/{customer_id}/transactions", response_model=Transaction
+    "/customers/{customer_id}/transactions", response_model=Envelope[Transaction]
 )
-async def get_customer_transactions(customer_id: int):
+async def get_all_customer_transactions(customer_id: int):
     try:
         return fetch_transaction_list(customer_id)
     except KeyError as e:
@@ -67,7 +65,7 @@ async def get_customer_transactions(customer_id: int):
 
 @business_router.get(
     "/customers/{customer_id}/transactions/{transaction_id}",
-    response_model=List[Transaction],
+    response_model=Transaction,
 )
 async def get_transaction_by_id(customer_id: int, transaction_id: int):
     try:
