@@ -1,7 +1,14 @@
 import re
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, computed_field, field_validator
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    computed_field,
+    field_validator,
+    model_validator,
+)
+from pydantic.fields import Field
 
 
 class CustomerBase(BaseModel):
@@ -28,27 +35,51 @@ class CustomerCreate(CustomerBase):
 
 
 class Customer(CustomerBase):
-    id: int | None = None
+    id: int
 
 
-class Transaction(BaseModel):
-    id: int  # enforced
-    amount: int
-    description: str
-    timestamp: datetime
-
-
-class InvoiceCreate(BaseModel):
+## --- Transaction Models ---
+class TransactionBase(BaseModel):
+    # id: int  # enforced
+    amount: int = Field(gt=0)
     customer_id: int
-    transactions: list[Transaction]
+    description: str
 
 
-class InvoiceResponse(BaseModel):
+class TransactionCreate(TransactionBase):
+    pass
+
+
+class Transaction(TransactionBase):
+    timestamp: datetime
+    id: int
+
+
+## --- Invoice Models ---
+class InvoiceBase(BaseModel):
+    customer_id: int
+    start_date: datetime
+    end_date: datetime
+
+    @model_validator(mode="after")
+    def check_date_order(self) -> "InvoiceBase":
+        if self.start_date >= self.end_date:
+            raise ValueError("The start date must be strictly before the end date.")
+        return self
+
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+
+class Invoice(BaseModel):
     id: int
     customer: Customer
     transactions: list[Transaction]
+    date_generated: datetime
+    paid: bool
 
-    @computed_field
     @property
+    @computed_field
     def total_amount(self) -> int:
         return sum(t.amount for t in self.transactions)

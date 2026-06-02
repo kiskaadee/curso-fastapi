@@ -45,6 +45,7 @@ dependencies = [
     "shellingham==1.5.4",
     "starlette==1.0.0",
     "typer==0.25.1",
+    "types-pytz>=2026.2.0.20260518",
     "typing-extensions==4.15.0",
     "typing-inspection==0.4.2",
     "urllib3==2.7.0",
