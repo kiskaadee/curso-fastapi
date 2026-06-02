@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from models.business import (
@@ -41,7 +41,7 @@ def list_customers() -> Envelope[Customer]:
 def new_transaction(transaction_data: TransactionCreate):
 
     transaction_id: int = generate_unique_id(mock_transaction_db, 100000, 999999)
-    timestamp: datetime = datetime.now()
+    timestamp: datetime = datetime.now(timezone.utc)
     transaction = Transaction(
         id=transaction_id, timestamp=timestamp, **transaction_data.model_dump()
     )
@@ -97,7 +97,7 @@ def generate_invoice(invoice_data: InvoiceCreate) -> Invoice:
         id=invoice_id,
         customer=customer,
         transactions=billing_transactions,
-        date_generated=datetime.now(),
+        date_generated=datetime.now(timezone.utc),
         paid=False,
     )
     # database insertion

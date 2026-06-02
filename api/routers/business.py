@@ -41,7 +41,7 @@ async def get_customer_by_id(customer_id: int):
     try:
         return fetch_customer(customer_id)
     except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=e.args[0])
 
 
 #       --- TRANSACTIONS ---
@@ -50,7 +50,7 @@ async def create_transaction(transaction_data: TransactionCreate):
     try:
         return new_transaction(transaction_data)
     except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=e.args[0])
 
 
 @business_router.get(
@@ -60,7 +60,7 @@ async def get_all_customer_transactions(customer_id: int):
     try:
         return fetch_transaction_list(customer_id)
     except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=e.args[0])
 
 
 @business_router.get(
@@ -71,7 +71,7 @@ async def get_transaction_by_id(customer_id: int, transaction_id: int):
     try:
         return fetch_transaction(customer_id, transaction_id)
     except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=e.args[0])
 
 
 #       --- INVOICES ---
@@ -80,7 +80,7 @@ async def create_invoice(invoice_data: InvoiceCreate):
     try:
         return generate_invoice(invoice_data)
     except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=e.args[0])
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -92,4 +92,4 @@ async def get_invoice_by_id(customer_id: int, invoice_id: int):
     try:
         return fetch_invoice(invoice_id, customer_id)
     except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=e.args[0])
