@@ -43,6 +43,7 @@ dependencies = [
     "ruff>=0.15.15",
     "sentry-sdk==2.60.0",
     "shellingham==1.5.4",
+    "sqlmodel>=0.0.38",
     "starlette==1.0.0",
     "typer==0.25.1",
     "types-pytz>=2026.2.0.20260518",
