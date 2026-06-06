@@ -8,3 +8,5 @@ fastapi-venv*
 .mypy_cache/
 .pytest_cache/
 .ruff_cache
+*.db
+*.sqlite3
