@@ -18,6 +18,8 @@ This directory contains my step-by-step progress through the Platzi FastAPI cour
     - Layered architecture, `EmailStr`, DTO pattern, and computed fields.
 7.  **[Clase 7: Separation of Concerns (Routers, Services & DTOs)](./07-separation-of-concerns.md)**
     - Three-layer architecture, strict validation, and response mapping.
+8.  **[Clase 8: Database Integration, SQLModel & Lifecycle Management](./08-sqlite-sqlmodel-lifecycle.md)**
+    - SQLite persistence, SSOT with SQLModel, Multiple Models Pattern, and `yield` dependency injection.
 
 ---
 
