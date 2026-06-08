@@ -1,5 +1,6 @@
+from typing import Annotated
+
 from fastapi import Depends
-from sqlalchemy.sql.annotation import Annotated
 from sqlmodel import Session, create_engine
 
 sqlite_name: str = "db.sqlite3"

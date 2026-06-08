@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.config import settings
-from routers.business import business_router
+from config.settings import settings
+from routers.customers import customer_router
 from routers.info import info_router
 
 
@@ -18,7 +18,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(info_router)
-    app.include_router(business_router)
+    app.include_router(customer_router)
 
     return app
 
